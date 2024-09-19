@@ -1,10 +1,26 @@
-const { creates, gets, getsById, updates, deletesById } = require("./user.services");
+const { creates, gets, getsById, updates, deletesById, createUser } = require("./user.services");
 
 
 module.exports = {
     create:(req,res) => {
         const body = req.body;
         creates(body, (err, results) => {
+            if(err){
+                return res.status(500).json({
+                    success:0,
+                    data:err
+                });
+            }else{
+                return res.status(200).json({
+                    sucsess:1,
+                    data:results
+                });
+            }
+        });
+     },
+     createUser:(req,res) => {
+        const body = req.body;
+        createUser(body, (err, results) => {
             if(err){
                 return res.status(500).json({
                     success:0,

@@ -1,18 +1,18 @@
 const pool = require("../../config/dbconfig");
 
 
-module.exports  = {
-     creates:(data, callBack) => {
+module.exports = {
+    creates: (data, callBack) => {
         pool.query(
             `select * from user_master where email = ?`,
             [data.email],
-            (err,results) =>{
-                var date=new Date();
-                var status="active";
-                if(results == ""){
+            (err, results) => {
+                var date = new Date();
+                var status = "active";
+                if (results == "") {
                     pool.query(
                         `INSERT INTO user_master(first_name,last_name,gender,email,contact,date_of_birth,date,status,blood_pressure,pulse,blood_group,height,weight,city_id,state_id,district_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-                         [
+                        [
                             data.first_name,
                             data.last_name,
                             data.gender,
@@ -29,16 +29,16 @@ module.exports  = {
                             data.city_id,
                             data.state_id,
                             data.district_id
-                         ],
-                         (err,results) =>{
-                             if(err){
-                                return callBack(err);   
-                             }
-                             else{
-                                   var status="active";
-                                   var date=new Date();
-                                   var user_type = "user";
-                                   var password = "user" + Math.floor(Math.random() * 90000 + 10000);
+                        ],
+                        (err, results) => {
+                            if (err) {
+                                return callBack(err);
+                            }
+                            else {
+                                var status = "active";
+                                var date = new Date();
+                                var user_type = "user";
+                                var password = "user" + Math.floor(Math.random() * 90000 + 10000);
                                 pool.query(
                                     `INSERT INTO login_master(user_name,user_email,user_type,user_password,status,date ) VALUES (?,?,?,?,?,?)`,
                                     [
@@ -49,80 +49,126 @@ module.exports  = {
                                         status,
                                         date
                                     ],
-                                    (error)=> {
-                                        if(error){
+                                    (error) => {
+                                        if (error) {
                                             return callBack(error);
-                                        }else{
+                                        } else {
                                             message = {
-                                                student_email:data.student_email,
-                                                password:password
+                                                student_email: data.student_email,
+                                                password: password
                                             };
-                                            return callBack(null,message);
+                                            return callBack(null, message);
                                         }
-                                    }                                    
+                                    }
                                 );
-                                
-                           }
 
-                         }
-                     );
-                }else if(err){
+                            }
+
+                        }
+                    );
+                } else if (err) {
                     return callBack(err);
-                }else{
+                } else {
                     err = "Data Found Duplicate";
                     return callBack(err);
                 }
             }
-         ); 
-                  
-     },
-     getsById:(id,callBack) => {
+        );
+
+    },
+
+    createUser: (data, callBack) => {
+        pool.query(
+            `select * from login_master where user_email = ?`,
+            [data.email],
+            (err, results) => {
+                var date = new Date();
+                var status = "active";
+                if (err) {
+                    return callBack(err);
+                }
+                else if (results.length > 0) {
+                    err = "User Already Registered";
+                    return callBack(err)
+                } else {
+                    // return callBack(null, "data Not found");
+                    var status = "active";
+                    var date = new Date();
+                    var user_type = "user";
+                    var userpassword = "12345"
+                    var password = "user" + Math.floor(Math.random() * 90000 + 10000);
+                    pool.query(
+                        `INSERT INTO login_master(user_name,user_email,user_type,user_password,status,date ) VALUES (?,?,?,?,?,?)`,
+                        [
+                            data.username,
+                            data.email,
+                            user_type,
+                            userpassword,
+                            status,
+                            date
+                        ],
+                        (error) => {
+                            if (error) {
+                                return callBack(error);
+                            } else {
+                                message = "Data added successfully";                            
+                                return callBack(null, message);
+                            }
+                        }
+                    );
+                }
+
+            }
+        );
+
+    },
+    getsById: (id, callBack) => {
         pool.query(
             `select * from user_master where id = ?`,
             [id],
-            (err,results,fields) => {
-                if(err){
+            (err, results, fields) => {
+                if (err) {
                     return callBack(err);
                 }
-                else if(results == ""){
+                else if (results == "") {
                     err = "Data not found";
                     return callBack(err)
-                }else{
-                    return callBack(null, results);
-                }
-                
-            }
-        );
-     },
-     //getting the products data
-     gets:(callBack) => {
-         pool.query(
-            `select * from user_master`,
-            (err,results) => {
-                if(err){
-                    return callBack(err);
-                }else if(results == ""){
-                    err = "Data Not Found";
-                    return callBack(err);
-                }else{
+                } else {
                     return callBack(null, results);
                 }
 
             }
-         );
-     },
-     updates:(data, id, callBack) => {
+        );
+    },
+    //getting the products data
+    gets: (callBack) => {
+        pool.query(
+            `select * from user_master`,
+            (err, results) => {
+                if (err) {
+                    return callBack(err);
+                } else if (results == "") {
+                    err = "Data Not Found";
+                    return callBack(err);
+                } else {
+                    return callBack(null, results);
+                }
+
+            }
+        );
+    },
+    updates: (data, id, callBack) => {
         pool.query(
             `select * from user_master where  id = ?`,
             [
-                
+
                 id
             ],
-            (err,results) =>{
-                if(results == ""){
+            (err, results) => {
+                if (results == "") {
                     pool.query(
                         `UPDATE student SET student_name=?,student_email=?,student_contact=?,student_image=?,balance=?,student_status=? WHERE  id = ?`,
-                         [
+                        [
                             data.student_name,
                             data.student_email,
                             data.student_contact,
@@ -130,40 +176,40 @@ module.exports  = {
                             data.balance,
                             data.student_status,
                             id
-                         ],
-                         (err,results) =>{
-                             if(err){
-                                return callBack(err);   
-                             }
-                             else{
-                                 return callBack(null, results);
-                             }
-                         }
-                     );
-                }else if(err){
+                        ],
+                        (err, results) => {
+                            if (err) {
+                                return callBack(err);
+                            }
+                            else {
+                                return callBack(null, results);
+                            }
+                        }
+                    );
+                } else if (err) {
                     return callBack(err);
-                }else{
+                } else {
                     err = "Data Found Duplicate";
                     return callBack(err);
                 }
             }
-         );         
-     },
-     deletesById:(id,callBack) => {
+        );
+    },
+    deletesById: (id, callBack) => {
         pool.query(`delete from user_master where id=?`,
-            [ 
+            [
                 id
-            ],        
-            (err,results) => {
-                if(err){
+            ],
+            (err, results) => {
+                if (err) {
                     return callBack(err);
-                }else if(results == ""){                    
+                } else if (results == "") {
                     return callBack("Data not found");
-                }else{  
+                } else {
                     message = "Data deleted successfully";
                     return callBack(null, message);
                 }
             }
-    );
-     },    
+        );
+    },
 };
